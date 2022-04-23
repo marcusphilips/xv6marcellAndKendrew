@@ -31,7 +31,8 @@ main(void)
       printf(1, "init: exec sh failed\n");
       exit(0);
     }
-    while((wpid=wait()) >= 0 && wpid != pid)
+    int one = 1;
+    while((wpid=wait(&one)) >= 0 && wpid != pid)
       printf(1, "zombie!\n");
   }
 }

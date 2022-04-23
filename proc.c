@@ -276,7 +276,7 @@ wait(int *status)
   int havekids, pid;
   struct proc *curproc = myproc();
   if (status == 0x0){ // if status is nullptr
-
+    return -1;
   }
   acquire(&ptable.lock);
   for(;;){
@@ -303,9 +303,20 @@ wait(int *status)
     }
 
     // No point waiting if we don't have any children.
-    if(!havekids || curproc->killed){
+   /* if(!havekids || curproc->killed){
       release(&ptable.lock);
       return -1;
+    }*/
+    // if no kids then return -1
+    if(havekids == 0){
+      release(&ptable.lock);
+      return -1;
+    }
+    // if the current process has been killed but we still have kids
+    // then return the kid's pid
+    if (curproc->killed && havekids != 0){
+      release(&ptable.lock);
+      return p->pid;
     }
 
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
