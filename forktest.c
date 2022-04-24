@@ -32,20 +32,22 @@ forktest(void)
     printf(1, "fork claimed to work N times!\n", N);
     exit(n);
   }
-
+  int one = 1;
+  
   for(; n > 0; n--){
-    if(wait() < 0){
+    if(wait(&one) < 0){
       printf(1, "wait stopped early\n");
       exit(-1);
     }
   }
 
-  if(wait() != -1){
+  if(wait(&one) != -1){
     printf(1, "wait got too many\n");
     exit(1);
   }
 
   printf(1, "fork test OK\n");
+ // free(one);
 }
 
 int
@@ -53,4 +55,5 @@ main(void)
 {
   forktest();
   exit(0);
+    return 0;
 }
