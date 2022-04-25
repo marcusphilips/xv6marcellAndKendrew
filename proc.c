@@ -561,27 +561,37 @@ void procdump(void)
 // wait for pid to terminate
 int waitpid(int pid, int *status, int options)
 {
+ // cprintf("pid = %d\n", pid);
   struct proc *p = 0x0;
-  unsigned char found = 0;
-  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  if (pid != 0)
   {
-    if (p->pid == pid){
-      found = 1;
-      break;
+    unsigned char found = 0;
+    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    {
+      if (p->pid == pid)
+      {
+        found = 1;
+        break;
+      }
+    }
+    if (found == 0)
+    {
+      return -1;
     }
   }
-  if (found == 0)
-  {
-    return -1;
+  else
+  { // if pid is 0 then it is the parent
+    p = myproc()->parent;
   }
   // found p with the parameter of pid
   // must make p run until completion
-  acquire(&ptable.lock);
-  while (1){
+ // acquire(&ptable.lock);
+  while (1)
+  {
     // switchuvm(p);
     if (p->killed != 0 || p == 0x0)
       break;
   }
-  release(&ptable.lock);
+//  release(&ptable.lock);
   return pid;
 }

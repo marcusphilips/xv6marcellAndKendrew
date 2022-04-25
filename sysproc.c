@@ -14,16 +14,20 @@ sys_fork(void)
 }
 
 int
-sys_exit(int status)
+sys_exit(void)
 {
-  exit( status);
-  return 0;  // not reached
+  int input;
+  argint(0, &input);
+  exit(input); 
+  return 0; // not reached
 }
 
 int
-sys_wait(int *status)
+sys_wait(void)
 {
-  return wait(status);
+  int* input;
+  argint(0, input);
+  return wait(input);
 }
 
 int
@@ -91,7 +95,13 @@ sys_uptime(void)
 }
 
 int 
-sys_waitpid(int pid, int *status, int options){
-  return waitpid(pid, status, options);
+sys_waitpid(void){
+  int input0;
+  int* input1;
+  int input2;
+  argint(0, &input0);
+  argint(1, input1);
+  argint(2, &input2);
+  return waitpid(input0, input1, input2);
 }
 
