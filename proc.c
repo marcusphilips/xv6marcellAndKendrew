@@ -285,8 +285,9 @@ int wait(int *status)
   /*if (status == 0x0)
   { // if status is nullptr
     return -1;
-  }*/
+  }*/ 
   acquire(&ptable.lock);
+ 
   for (;;)
   {
     // Scan through table looking for exited children.
@@ -295,7 +296,7 @@ int wait(int *status)
     {
       if (p->parent != curproc)
         continue;
-      havekids = 1;
+      havekids = 1; 
       if (p->state == ZOMBIE)
       {
         // Found one.
@@ -319,6 +320,7 @@ int wait(int *status)
        return -1;
      }*/
     // if no kids then return -1
+    // *status = p->pid + 4;
     if (havekids == 0)
     {
       release(&ptable.lock);
@@ -558,51 +560,61 @@ void procdump(void)
   }
 }
 
-int
-waitpid(int pid, int* status, int options)
+int waitpid(int pid, int *status, int options)
 {
   struct proc *p, *curproc = myproc();
-  int found_process; //similar to havekids in wait()
+  int found_process; // similar to havekids in wait()
+  if (curproc->pid == pid){
+    return wait(status);
+  }
   acquire(&ptable.lock);
-  
-  //Loops continuously till the process with given pid is terminated
-  for(;;) {
-    found_process = 0;    
-    
-    //Scan through the process table looking for exited processes. Terminated
-    //processes will be in ZOMBIE state.
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+  *status = pid + 4;
+  // Loops continuously till the process with given pid is terminated
+  for (;;)
+  {
+    found_process = 0;
+
+    // Scan through the process table looking for exited processes. Terminated
+    // processes will be in ZOMBIE state.
+    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    {
       // If the process pid does not match the given pid, no need to continue
       // with this process.
-      if(p->pid != pid) continue;
+      if (p->pid != pid)
+        continue;
 
       found_process = 1;
-      if(p->state == ZOMBIE) {
-	//Found the process with the given pid that has exited.
-	kfree(p->kstack);
-	p->kstack = 0;
-	freevm(p->pgdir);
-	p->pid = 0;
-	p->parent = 0;
-	p->name[0] = 0;
-	p->killed = 0;
-	p->state = UNUSED;
+      if (p->state == ZOMBIE)
+      {
+        // Found the process with the given pid that has exited.
+        kfree(p->kstack);
+        p->kstack = 0;
+        freevm(p->pgdir);
+        p->pid = 0;
+        p->parent = 0;
+        p->name[0] = 0;
+        p->killed = 0;
+        p->state = UNUSED;
 
-	release(&ptable.lock);
-	return pid;
-      } else if(options == 1) { //if options is passed by the user.
-	
-	//the process with the given pid is still running, so we
-	//don't block the current process, just release the lock on
-	//ptable and return 0.
-	release(&ptable.lock);
-	return 0;
-      } 
+        release(&ptable.lock);
+        return pid;
+      }
+      else if (options == 1)
+      { // if options is passed by the user.
+
+        // the process with the given pid is still running, so we
+        // don't block the current process, just release the lock on
+        // ptable and return 0.
+        
+        release(&ptable.lock);
+        return 0;
+      }
     }
 
     // No point waiting if the the process with given pid does not exist
     // or the current process is killed.
-    if(!found_process || curproc->killed) {
+    if (!found_process || curproc->killed)
+    {
       release(&ptable.lock);
       return -1;
     }
