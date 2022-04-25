@@ -8,7 +8,6 @@ OBJS = \
 	ioapic.o\
 	kalloc.o\
 	kbd.o\
-	lab1_test.o\
 	lapic.o\
 	log.o\
 	main.o\
