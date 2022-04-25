@@ -297,6 +297,7 @@ int wait(int *status)
       if (p->parent != curproc)
         continue;
       havekids = 1; 
+      *status = p->state;
       if (p->state == ZOMBIE)
       {
         // Found one.
