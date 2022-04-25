@@ -562,12 +562,15 @@ void procdump(void)
 int waitpid(int pid, int *status, int options)
 {
   struct proc *p = 0x0;
+  unsigned char found = 0;
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
   {
-    if (p->pid == pid)
+    if (p->pid == pid){
+      found = 1;
       break;
+    }
   }
-  if (p == 0x0)
+  if (found == 0)
   {
     return -1;
   }
@@ -575,14 +578,10 @@ int waitpid(int pid, int *status, int options)
   // must make p run until completion
   acquire(&ptable.lock);
   while (1){
-    switchuvm(p);
+    // switchuvm(p);
     if (p->killed != 0 || p == 0x0)
       break;
   }
   release(&ptable.lock);
   return pid;
-}
-
-void lab1_test(void){
-  cprintf("In Kernal Space\n");
 }
