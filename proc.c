@@ -600,16 +600,6 @@ int waitpid(int pid, int *status, int options)
         release(&ptable.lock);
         return pid;
       }
-      else if (options == 1)
-      { // if options is passed by the user.
-
-        // the process with the given pid is still running, so we
-        // don't block the current process, just release the lock on
-        // ptable and return 0.
-        
-        release(&ptable.lock);
-        return 0;
-      }
     }
 
     // No point waiting if the the process with given pid does not exist
