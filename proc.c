@@ -558,30 +558,56 @@ void procdump(void)
   }
 }
 
-// wait for pid to terminate
-int waitpid(int pid, int *status, int options)
+int
+waitpid(int pid, int* status, int options)
 {
-  struct proc *p = 0x0;
-  unsigned char found = 0;
-  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-  {
-    if (p->pid == pid){
-      found = 1;
-      break;
-    }
-  }
-  if (found == 0)
-  {
-    return -1;
-  }
-  // found p with the parameter of pid
-  // must make p run until completion
+  struct proc *p, *curproc = myproc();
+  int found_process; //similar to havekids in wait()
   acquire(&ptable.lock);
-  while (1){
-    // switchuvm(p);
-    if (p->killed != 0 || p == 0x0)
-      break;
+  
+  //Loops continuously till the process with given pid is terminated
+  for(;;) {
+    found_process = 0;    
+    
+    //Scan through the process table looking for exited processes. Terminated
+    //processes will be in ZOMBIE state.
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+      // If the process pid does not match the given pid, no need to continue
+      // with this process.
+      if(p->pid != pid) continue;
+
+      found_process = 1;
+      if(p->state == ZOMBIE) {
+	//Found the process with the given pid that has exited.
+	kfree(p->kstack);
+	p->kstack = 0;
+	freevm(p->pgdir);
+	p->pid = 0;
+	p->parent = 0;
+	p->name[0] = 0;
+	p->killed = 0;
+	p->state = UNUSED;
+
+	release(&ptable.lock);
+	return pid;
+      } else if(options == 1) { //if options is passed by the user.
+	
+	//the process with the given pid is still running, so we
+	//don't block the current process, just release the lock on
+	//ptable and return 0.
+	release(&ptable.lock);
+	return 0;
+      } 
+    }
+
+    // No point waiting if the the process with given pid does not exist
+    // or the current process is killed.
+    if(!found_process || curproc->killed) {
+      release(&ptable.lock);
+      return -1;
+    }
+
+    // Wait for the process with the given pid to exit.
+    sleep(curproc, &ptable.lock);
   }
-  release(&ptable.lock);
-  return pid;
 }
