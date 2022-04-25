@@ -282,10 +282,10 @@ int wait(int *status)
   struct proc *p;
   int havekids, pid;
   struct proc *curproc = myproc();
-  if (status == 0x0)
+  /*if (status == 0x0)
   { // if status is nullptr
     return -1;
-  }
+  }*/
   acquire(&ptable.lock);
   for (;;)
   {
@@ -581,4 +581,8 @@ int waitpid(int pid, int *status, int options)
   }
   release(&ptable.lock);
   return pid;
+}
+
+void lab1_test(void){
+  cprintf("In Kernal Space\n");
 }

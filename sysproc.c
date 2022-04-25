@@ -89,3 +89,9 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int 
+sys_waitpid(int pid, int *status, int options){
+  return waitpid(pid, status, options);
+}
+
