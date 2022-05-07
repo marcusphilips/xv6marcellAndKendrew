@@ -11,7 +11,7 @@ void work() {
 }
 
 int main() {
-  set_prior(0);
+ /* set_prior(0);
   int i = 0;
   int pid = 0;
   for(i = 0; i < 3; i++) {
@@ -28,5 +28,5 @@ int main() {
       wait();
   }
   printf(0, "parent %d done\n", getpid());
-  exit();
+ */ exit();
 }
