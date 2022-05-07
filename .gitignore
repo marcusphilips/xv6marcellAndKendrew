@@ -16,3 +16,6 @@ mkfs
 .gdbinit
 .vscode/settings.json
 a.out
+.vscode/dryrun.log
+.vscode/targets.log
+.vscode/configurationCache.log
