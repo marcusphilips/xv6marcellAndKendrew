@@ -558,3 +558,7 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+void set_prior(int n){
+  myproc()->priority = n;
+}
