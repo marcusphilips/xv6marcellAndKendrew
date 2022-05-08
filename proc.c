@@ -349,6 +349,15 @@ scheduler(void)
     swtch(&(c->scheduler), p->context);
     switchkvm();
     c->proc = 0;
+    // add aging process
+    for (i = ptable.proc; i < &ptable.proc[NPROC]; i++){
+      // assuming RUNNABLE is equivalent to READY
+      if (i != p && i->state == RUNNABLE){
+        if (i->priority > 0){
+          i->priority = i->priority - 1;
+        }
+      }
+    }
     // for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     //   if(p->state != RUNNABLE)
     //     continue;
