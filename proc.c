@@ -112,6 +112,7 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
   p->priority = 15;
+  p->birth = ticks;
   return p;
 }
 
@@ -248,7 +249,10 @@ exit(void)
   curproc->cwd = 0;
 
   acquire(&ptable.lock);
-
+  // print out the lifetime of the process
+  uint lifetime = ticks - curproc->birth;
+  cprintf("Lifetime of a process %s: %d", curproc->name, lifetime);
+  cprintf("\n");
   // Parent might be sleeping in wait().
   wakeup1(curproc->parent);
 

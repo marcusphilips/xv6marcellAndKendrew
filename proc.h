@@ -38,6 +38,7 @@ enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 struct proc {
   int priority;           // Priority will be a value from 0 - 31 with 0 having the highest
                                // priority for scheduling
+  uint birth;
   uint sz;                     // Size of process memory (bytes)
   pde_t* pgdir;                // Page table
   char *kstack;                // Bottom of kernel stack for this process
